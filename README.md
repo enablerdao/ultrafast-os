@@ -2,28 +2,80 @@
 
 このプロジェクトは、高速起動と応答性を重視したオペレーティングシステムの概念実装です。1秒以内の起動時間と50ミリ秒以内の画面表示を目標としています。
 
+## 実行方法
+
+### Docker を使用した実行方法（推奨）
+
+最も簡単な方法は、Docker を使用してシミュレータを実行することです：
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/enablerdao/ultrafast-os.git
+cd ultrafast-os/docker
+
+# Dockerイメージをビルドして実行
+docker-compose up
+```
+
+または、個別のコンテナを実行することもできます：
+
+```bash
+# 日本語版
+docker-compose up ultrafast-os-jp
+
+# 英語版
+docker-compose up ultrafast-os-en
+```
+
+### 手動でのコンパイルと実行
+
+```bash
+# 必要なパッケージをインストール
+sudo apt-get update
+sudo apt-get install -y build-essential gcc make libncurses5-dev
+
+# リポジトリをクローン
+git clone https://github.com/enablerdao/ultrafast-os.git
+cd ultrafast-os
+
+# シミュレータをコンパイル
+gcc -o os_simulator_auto os_simulator_auto.c -pthread
+gcc -o fast_os_simulation fast_os_simulation.c -pthread
+
+# 実行
+./os_simulator_auto  # 日本語版
+./fast_os_simulation # 英語版
+```
+
+### macOS での実行方法
+
+macOS用のインストールスクリプトを使用できます：
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/enablerdao/ultrafast-os.git
+cd ultrafast-os
+
+# インストールスクリプトを実行
+chmod +x install_mac.sh
+./install_mac.sh
+```
+
 ## プロジェクトの構成
 
 このプロジェクトは以下のファイルで構成されています：
 
-1. **ブートローダー** (`bootloader.asm`): 
-   - システム起動時に最初に実行される部分
-   - カーネルをメモリにロードし、制御をカーネルに渡す
+1. **シミュレータ**:
+   - `os_simulator_auto.c` - 日本語版OSシミュレータ
+   - `fast_os_simulation.c` - 英語版OSシミュレータ
+   - `docker/` - Dockerベースのシミュレータ
 
-2. **カーネルエントリーポイント** (`kernel_entry.asm`):
-   - 16ビットモードから32ビットプロテクトモードへの切り替え
-   - Cで書かれたカーネルコードへのジャンプ
-
-3. **カーネル** (`kernel.c`, `kernel_64.c`):
-   - OSの中核機能を実装
-   - メモリ管理、プロセス管理、画面表示などの基本機能
-
-4. **リンカスクリプト** (`linker.ld`):
-   - カーネルのメモリレイアウトを定義
-
-5. **OSシミュレータ** (`os_simulator_auto.c`):
-   - 実際のOSの動作をシミュレートするプログラム
-   - 高速起動、メモリ管理、プロセス管理、並列処理などの概念を示す
+2. **OS実装コンセプト**:
+   - `bootloader.asm` - ブートローダーのアセンブリコード
+   - `kernel_entry.asm` - カーネルエントリーポイントのアセンブリコード
+   - `kernel.c` - カーネルのCコード
+   - `kernel_64.c` - 64ビット用カーネルのCコード
+   - `linker.ld` - リンカスクリプト
 
 ## 主要な機能
 
@@ -51,38 +103,6 @@
 - マルチスレッド対応
 - 効率的なタスク実行
 - CPUコアの最大活用
-
-## ビルドと実行方法
-
-### 実際のOSコンポーネント（理論的な手順）
-```bash
-# ブートローダーのコンパイル
-nasm -f bin bootloader.asm -o bootloader.bin
-
-# カーネルエントリーのコンパイル
-nasm -f bin kernel_entry.asm -o kernel_entry.bin
-
-# カーネルのコンパイル（32ビット環境が必要）
-gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -c kernel.c -o kernel.o
-
-# カーネルのリンク
-ld -m elf_i386 -T linker.ld -o kernel.bin kernel.o
-
-# OSイメージの作成
-cat bootloader.bin kernel_entry.bin kernel.bin > os_image.bin
-
-# QEMUでの実行
-qemu-system-i386 -fda os_image.bin
-```
-
-### OSシミュレータの実行
-```bash
-# コンパイル
-gcc -o os_simulator_auto os_simulator_auto.c -pthread
-
-# 実行
-./os_simulator_auto
-```
 
 ## 設計思想
 
