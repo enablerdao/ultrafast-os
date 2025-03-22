@@ -1,0 +1,29 @@
+# macOS用Makefile
+
+# コンパイラとフラグ
+CC = gcc
+CFLAGS = -Wall -Wextra -pthread
+
+# ターゲット
+all: os_simulator_mac fast_os_simulation_mac
+
+# 日本語版シミュレータ
+os_simulator_mac: os_simulator_mac.c
+        $(CC) $(CFLAGS) -o $@ $<
+
+# 英語版シミュレータ
+fast_os_simulation_mac: fast_os_simulation_mac.c
+        $(CC) $(CFLAGS) -o $@ $<
+
+# クリーンアップ
+clean:
+        rm -f os_simulator_mac fast_os_simulation_mac
+
+# 実行
+run-jp: os_simulator_mac
+        ./os_simulator_mac
+
+run-en: fast_os_simulation_mac
+        ./fast_os_simulation_mac
+
+.PHONY: all clean run-jp run-en

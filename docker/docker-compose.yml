@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  ultrafast-os-jp:
+    build: .
+    container_name: ultrafast-os-jp
+    command: ./os_simulator_auto
+    tty: true
+    stdin_open: true
+
+  ultrafast-os-en:
+    build: .
+    container_name: ultrafast-os-en
+    command: ./fast_os_simulation
+    tty: true
+    stdin_open: true
