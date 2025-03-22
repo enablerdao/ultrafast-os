@@ -37,12 +37,86 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # ファイルをコピー
 cp "$SCRIPT_DIR/os_simulator_mac.c" .
 cp "$SCRIPT_DIR/fast_os_simulation_mac.c" .
-cp "$SCRIPT_DIR/Makefile.mac.fixed" ./Makefile
-cp "$SCRIPT_DIR/README_MAC.md" ./README.md
+
+# Makefileを作成
+echo -e "${YELLOW}Makefileを作成しています...${NC}"
+cat > Makefile << 'EOF'
+# macOS用Makefile
+
+# コンパイラとフラグ
+CC = gcc
+CFLAGS = -Wall -Wextra -pthread
+
+# ターゲット
+all: os_simulator_mac fast_os_simulation_mac
+
+# 日本語版シミュレータ
+os_simulator_mac: os_simulator_mac.c
+        $(CC) $(CFLAGS) -o $@ $<
+
+# 英語版シミュレータ
+fast_os_simulation_mac: fast_os_simulation_mac.c
+        $(CC) $(CFLAGS) -o $@ $<
+
+# クリーンアップ
+clean:
+        rm -f os_simulator_mac fast_os_simulation_mac
+
+# 実行
+run-jp: os_simulator_mac
+        ./os_simulator_mac
+
+run-en: fast_os_simulation_mac
+        ./fast_os_simulation_mac
+
+.PHONY: all clean run-jp run-en
+EOF
+
+# READMEを作成
+echo -e "${YELLOW}READMEを作成しています...${NC}"
+cat > README.md << 'EOF'
+# 超高速OS シミュレータ (macOS版)
+
+このプロジェクトは、高速起動と応答性を重視したオペレーティングシステムのシミュレータです。
+
+## 実行方法
+
+### 日本語版
+```bash
+./os_simulator_mac
+```
+または
+```bash
+make run-jp
+```
+
+### 英語版
+```bash
+./fast_os_simulation_mac
+```
+または
+```bash
+make run-en
+```
+
+## 特徴
+
+- 1秒以内の起動時間
+- 50ミリ秒以内の画面表示
+- マイクロカーネルアーキテクチャ
+- 効率的なメモリ管理
+- 優先度ベースのプロセススケジューリング
+- 並列タスク実行
+
+## ライセンス
+
+このプロジェクトは教育目的で自由に使用・改変可能です。
+EOF
 
 # コンパイル
 echo -e "${YELLOW}シミュレータをコンパイルしています...${NC}"
-make
+gcc -Wall -Wextra -pthread -o os_simulator_mac os_simulator_mac.c
+gcc -Wall -Wextra -pthread -o fast_os_simulation_mac fast_os_simulation_mac.c
 
 # 実行ファイルの権限設定
 chmod +x os_simulator_mac fast_os_simulation_mac
